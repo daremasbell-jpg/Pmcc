@@ -10,7 +10,7 @@ const sleep = (ms) => new Promise(r => setTimeout(r, ms));
  * Handles preamble text, markdown fences, trailing commas.
  */
 function parseJSON(text) {
-  let raw = text.trim()
+  let raw = text.trim()h
     .replace(/^```(?:json)?\s*/i, '')
     .replace(/\s*```$/i, '')
     .trim();
@@ -38,7 +38,7 @@ export async function callClaude(prompt, retries = 3) {
 
     try {
       const response = await client.messages.create({
-        model:      'claude-sonnet-4-20250514',
+        model:      'claude-sonnet-4-5',
         max_tokens: 4000,
         system:     SYSTEM_PROMPT,
         tools:      [{ type: 'web_search_20250305', name: 'web_search' }],
