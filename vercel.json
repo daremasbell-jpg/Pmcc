@@ -1,0 +1,13 @@
+{
+  "functions": {
+    "src/app/api/analyze/route.js": {
+      "maxDuration": 120
+    },
+    "src/app/api/recommend/route.js": {
+      "maxDuration": 120
+    },
+    "src/app/api/check-position/route.js": {
+      "maxDuration": 120
+    }
+  }
+}

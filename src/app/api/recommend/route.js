@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { callClaude } from '@/lib/claude';
 import { RECOMMEND_PROMPT } from '@/lib/prompts';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
     const data = await callClaude(RECOMMEND_PROMPT);

@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { callClaude } from '@/lib/claude';
 import { POSITION_CHECK_PROMPT } from '@/lib/prompts';
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(request) {
   try {
     const pos = await request.json();
