@@ -1,77 +1,78 @@
-/**
- * Client-side API helpers.
- * All calls go to our own Next.js backend — the Anthropic API key
- * never touches the browser.
- */
+# PMCC Analyzer — Deployment Guide
 
-const CACHE_KEY = 'pmcc_analysis_cache_v1';
-const CACHE_TTL = 4 * 60 * 60 * 1000; // 4 hours
+## What you need
+- A free [Vercel account](https://vercel.com) (sign up with GitHub)
+- A free [GitHub account](https://github.com) (to host the code)
+- An [Anthropic API key](https://console.anthropic.com) (~$5 to start, ~$0.01–0.03 per analysis)
 
-// ─── Cache helpers ────────────────────────────────────────────────────────────
-export function getCachedAnalysis(ticker) {
-  try {
-    const raw   = localStorage.getItem(CACHE_KEY);
-    const cache = raw ? JSON.parse(raw) : {};
-    const entry = cache[ticker.toUpperCase()];
-    if (!entry) return null;
-    if (Date.now() - entry.ts > CACHE_TTL) return null;
-    return entry.data;
-  } catch { return null; }
-}
+---
 
-export function setCachedAnalysis(ticker, data) {
-  try {
-    const raw   = localStorage.getItem(CACHE_KEY);
-    const cache = raw ? JSON.parse(raw) : {};
-    cache[ticker.toUpperCase()] = { data, ts: Date.now() };
-    const keys = Object.keys(cache);
-    if (keys.length > 20) delete cache[keys[0]];
-    localStorage.setItem(CACHE_KEY, JSON.stringify(cache));
-  } catch {}
-}
+## Step 1 — Get your Anthropic API key
+1. Go to https://console.anthropic.com
+2. Sign up / log in
+3. Click **API Keys** → **Create Key**
+4. Copy the key (starts with `sk-ant-...`)
+5. Add a payment method and load $5 credit
 
-export function clearCachedAnalysis(ticker) {
-  try {
-    const raw   = localStorage.getItem(CACHE_KEY);
-    const cache = raw ? JSON.parse(raw) : {};
-    delete cache[ticker.toUpperCase()];
-    localStorage.setItem(CACHE_KEY, JSON.stringify(cache));
-  } catch {}
-}
+---
 
-// ─── API calls ────────────────────────────────────────────────────────────────
-async function apiCall(url, options = {}) {
-  const res = await fetch(url, {
-    headers: { 'Content-Type': 'application/json' },
-    ...options,
-  });
+## Step 2 — Put the code on GitHub
+1. Go to https://github.com/new and create a **private** repository named `pmcc-analyzer`
+2. On your computer, open a terminal in the `pmcc-site` folder
+3. Run these commands:
+```bash
+git init
+git add .
+git commit -m "Initial PMCC Analyzer"
+git branch -M main
+git remote add origin https://github.com/YOUR_USERNAME/pmcc-analyzer.git
+git push -u origin main
+```
 
-  const data = await res.json();
+---
 
-  if (!res.ok) {
-    const msg = data?.error || `HTTP ${res.status}`;
-    const err = new Error(msg);
-    err.status = res.status;
-    throw err;
-  }
+## Step 3 — Deploy to Vercel
+1. Go to https://vercel.com/new
+2. Click **Import Git Repository** → select your `pmcc-analyzer` repo
+3. Keep all settings as default — Vercel auto-detects Next.js
+4. Click **Environment Variables** and add:
+   - Key: `ANTHROPIC_API_KEY`
+   - Value: `sk-ant-YOUR_KEY_HERE`
+5. Click **Deploy**
 
-  return data;
-}
+Your site will be live at `https://pmcc-analyzer.vercel.app` in ~2 minutes.
 
-export async function fetchRecommendations() {
-  return apiCall('/api/recommend');
-}
+---
 
-export async function fetchAnalysis(ticker) {
-  return apiCall('/api/analyze', {
-    method: 'POST',
-    body: JSON.stringify({ ticker }),
-  });
-}
+## Step 4 — Custom domain (optional)
+1. In Vercel dashboard → **Domains**
+2. Add your domain (e.g. `pmcc.yourdomain.com`)
+3. Follow the DNS instructions — SSL is automatic
 
-export async function fetchPositionCheck(position) {
-  return apiCall('/api/check-position', {
-    method: 'POST',
-    body: JSON.stringify(position),
-  });
-}
+---
+
+## Local development
+```bash
+npm install
+# Edit .env.local and add your API key
+npm run dev
+# Open http://localhost:3000
+```
+
+---
+
+## Security notes
+- Your API key is stored in Vercel's environment variables — **never** in the code
+- The key is only used server-side in `/api/*` routes — it never reaches the browser
+- All traffic is HTTPS by default on Vercel
+- The `.gitignore` prevents `.env.local` from being committed to GitHub
+
+---
+
+## Cost estimates
+| Action | Approx cost |
+|--------|-------------|
+| Analyze one ticker | ~$0.02 |
+| Top picks scan | ~$0.04 |
+| Position AI check | ~$0.02 |
+| 100 analyses/month | ~$2.00 |
