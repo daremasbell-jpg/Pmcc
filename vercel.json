@@ -1,7 +1,7 @@
 {
   "crons": [
     {
-      "path": "/api/alert-check?secret=REPLACE_WITH_YOUR_CRON_SECRET",
+      "path": "/api/alert-check?secret=mypassword123",
       "schedule": "0 13 * * 1-5"
     }
   ]
