@@ -10,7 +10,7 @@ const sleep = (ms) => new Promise(r => setTimeout(r, ms));
  * Handles preamble text, markdown fences, trailing commas.
  */
 function parseJSON(text) {
-  let raw = text.trim()h
+  let raw = text.trim()
     .replace(/^```(?:json)?\s*/i, '')
     .replace(/\s*```$/i, '')
     .trim();
