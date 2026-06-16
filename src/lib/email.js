@@ -17,7 +17,7 @@ export async function sendAlertEmail({ to, subject, positions, date }) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      from:    'PMCC Analyzer <alerts@pmcc-alerts.com>',
+            from: process.env.RESEND_FROM_EMAIL || 'PMCC Analyzer <onboarding@resend.dev>',
       to:      [to],
       subject,
       html,
